@@ -5,6 +5,7 @@ import(
     "log"
 )
 
+// This function retuns a *log.Logger object with the default format which prints messages to standard output.
 func NewEmlogStdout(component string) *log.Logger {
     var logger *log.Logger
     logger = golog.New(
@@ -15,6 +16,8 @@ func NewEmlogStdout(component string) *log.Logger {
     return logger
 }
 
+// This function retuns a *log.Logger object with the default format which writes messages to the specified file. The
+// file is opened in append or create mode. If the file cannot be opened or created, then an error is returned.
 func NewEmlogFile(component string, path string) (*log.Logger, error) {
     var logger *log.Logger
 
