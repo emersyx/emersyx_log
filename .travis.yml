@@ -21,8 +21,8 @@ notifications:
 # we are using vanity imports, so change the import path
 go_import_path: emersyx.net/emersyx_log
 
-# run make
-install: false
+# do not run make as it is in the script section
+install:
 
 # when go get runs, build as plugin
 gobuild_args: -buildmode=plugin
@@ -31,4 +31,4 @@ before_script:
     - go get github.com/golang/lint/golint                          # get the official go linter
 
 script:
-    - make test
+    - make
