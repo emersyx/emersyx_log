@@ -8,10 +8,10 @@ import (
 // NewEmlogStdout retuns a *log.Logger object with the default format which prints messages to standard output.
 func NewEmlogStdout(component string) *log.Logger {
 	var logger *log.Logger
-	logger = golog.New(
+	logger = log.New(
 		os.Stdout,
 		"["+component+"]",
-		golog.Ldate|golog.Ltime|golog.Lmicroseconds|golog.Lshortfile,
+		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile,
 	)
 	return logger
 }
@@ -26,9 +26,9 @@ func NewEmlogFile(component string, path string) (*log.Logger, error) {
 		return nil, err
 	}
 
-	logger = golog.New(
+	logger = log.New(
 		f,
 		"["+component+"]",
-		golog.Ldate|golog.Ltime|golog.Lmicroseconds|golog.Lshortfile,
+		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile,
 	)
 }
