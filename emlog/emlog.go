@@ -31,4 +31,6 @@ func NewEmlogFile(component string, path string) (*log.Logger, error) {
 		"["+component+"]",
 		log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile,
 	)
+
+	return logger, nil
 }
