@@ -34,7 +34,7 @@ func (el Emlog) Println(level uint, v ...interface{}) {
 	}
 }
 
-// NewEmlog retuns an Emlog instance with the default format, which writes messages to standard output if the stdout
+// NewEmlog returns an Emlog instance with the default format, which writes messages to standard output if the stdout
 // argument is true and/or the specified file if the path argument is given. If the file cannot be opened or created,
 // then an error is returned. The component argument is prepended to logs for easier filtering, while the level argument
 // controls the verbosity.
