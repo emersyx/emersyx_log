@@ -26,25 +26,85 @@ type EmersyxLogger struct {
 	level  uint
 }
 
-// Print calls Output to print to the standard logger. Arguments are handled in the manner of fmt.Print.
+// Print calls send messages to the standard logger. Arguments are handled in the manner of fmt.Print.
 func (el EmersyxLogger) Print(level uint, v ...interface{}) {
 	if level <= el.level {
 		el.logger.Print(v...)
 	}
 }
 
-// Printf calls Output to print to the standard logger. Arguments are handled in the manner of fmt.Printf.
+// Printf calls send messages to the standard logger. Arguments are handled in the manner of fmt.Printf.
 func (el EmersyxLogger) Printf(level uint, format string, v ...interface{}) {
 	if level <= el.level {
 		el.logger.Printf(format, v...)
 	}
 }
 
-// Println calls Output to print to the standard logger. Arguments are handled in the manner of fmt.Println.
+// Println calls send messages to the standard logger. Arguments are handled in the manner of fmt.Println.
 func (el EmersyxLogger) Println(level uint, v ...interface{}) {
 	if level <= el.level {
 		el.logger.Println(v...)
 	}
+}
+
+// Fatal calls the Print method with the ELFatal level and the given arguments.
+func (el EmersyxLogger) Fatal(v ...interface{}) {
+	el.Print(ELFatal, v...)
+}
+
+// Fatalf calls the Printf method with the ELFatal level and the given arguments.
+func (el EmersyxLogger) Fatalf(format string, v ...interface{}) {
+	el.Printf(ELFatal, format, v...)
+}
+
+// Fatalln calls the Println method with the ELFatal level and the given arguments.
+func (el EmersyxLogger) Fatalln(v ...interface{}) {
+	el.Println(ELFatal, v...)
+}
+
+// Error calls the Print method with the ELError level and the given arguments.
+func (el EmersyxLogger) Error(v ...interface{}) {
+	el.Print(ELError, v...)
+}
+
+// Errorf calls the Printf method with the ELError level and the given arguments.
+func (el EmersyxLogger) Errorf(format string, v ...interface{}) {
+	el.Printf(ELError, format, v...)
+}
+
+// Errorln calls the Println method with the ELError level and the given arguments.
+func (el EmersyxLogger) Errorln(v ...interface{}) {
+	el.Println(ELError, v...)
+}
+
+// Info calls the Print method with the ELInfo level and the given arguments.
+func (el EmersyxLogger) Info(v ...interface{}) {
+	el.Print(ELInfo, v...)
+}
+
+// Infof calls the Printf method with the ELInfo level and the given arguments.
+func (el EmersyxLogger) Infof(format string, v ...interface{}) {
+	el.Printf(ELInfo, format, v...)
+}
+
+// Infoln calls the Println method with the ELInfo level and the given arguments.
+func (el EmersyxLogger) Infoln(v ...interface{}) {
+	el.Println(ELInfo, v...)
+}
+
+// Debug calls the Print method with the ELDebug level and the given arguments.
+func (el EmersyxLogger) Debug(v ...interface{}) {
+	el.Print(ELDebug, v...)
+}
+
+// Debugf calls the Printf method with the ELDebug level and the given arguments.
+func (el EmersyxLogger) Debugf(format string, v ...interface{}) {
+	el.Printf(ELDebug, format, v...)
+}
+
+// Debugln calls the Println method with the ELDebug level and the given arguments.
+func (el EmersyxLogger) Debugln(v ...interface{}) {
+	el.Println(ELDebug, v...)
 }
 
 // NewEmersyxLogger returns an EmersyxLogger instance with the default format, which writes messages to standard output
