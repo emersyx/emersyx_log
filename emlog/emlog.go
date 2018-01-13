@@ -6,40 +6,53 @@ import (
 	"os"
 )
 
-// Emlog is an implementation of a logger based on the standard log.Logger type. The Emlog implementation offers
-// additional logging functionality
-type Emlog struct {
+const (
+	// ELNone completely turns off logging
+	ELNone = 0
+	// ELFatal sets logging to print messages of fatal events, which surely lead to a crash
+	ELFatal = 1
+	// ELError sets logging to print error messages, which may lead to a crash
+	ELError = 2
+	// ELInfo sets logging to print informational messages about the progress of tasks
+	ELInfo = 3
+	// ELDebug logs verbose debug messages
+	ELDebug = 4
+)
+
+// EmersyxLogger is an implementation of a logger based on the standard log.Logger type. The EmersyxLogger
+// implementation offers additional logging functionality
+type EmersyxLogger struct {
 	logger *log.Logger
 	level  uint
 }
 
 // Print calls Output to print to the standard logger. Arguments are handled in the manner of fmt.Print.
-func (el Emlog) Print(level uint, v ...interface{}) {
+func (el EmersyxLogger) Print(level uint, v ...interface{}) {
 	if level <= el.level {
 		el.logger.Print(v...)
 	}
 }
 
 // Printf calls Output to print to the standard logger. Arguments are handled in the manner of fmt.Printf.
-func (el Emlog) Printf(level uint, format string, v ...interface{}) {
+func (el EmersyxLogger) Printf(level uint, format string, v ...interface{}) {
 	if level <= el.level {
 		el.logger.Printf(format, v...)
 	}
 }
 
 // Println calls Output to print to the standard logger. Arguments are handled in the manner of fmt.Println.
-func (el Emlog) Println(level uint, v ...interface{}) {
+func (el EmersyxLogger) Println(level uint, v ...interface{}) {
 	if level <= el.level {
 		el.logger.Println(v...)
 	}
 }
 
-// NewEmlog returns an Emlog instance with the default format, which writes messages to standard output if the stdout
-// argument is true and/or the specified file if the path argument is given. If the file cannot be opened or created,
-// then an error is returned. The component argument is prepended to logs for easier filtering, while the level argument
-// controls the verbosity.
-func NewEmlog(stdout bool, path string, component string, level uint) (Emlog, error) {
-	var emlog Emlog
+// NewEmersyxLogger returns an EmersyxLogger instance with the default format, which writes messages to standard output
+// if the stdout argument is true and/or the specified file if the path argument is given. If the file cannot be opened
+// or created, then an error is returned. The component argument is prepended to logs for easier filtering, while the
+// level argument controls the verbosity.
+func NewEmersyxLogger(stdout bool, path string, component string, level uint) (EmersyxLogger, error) {
+	var emlog EmersyxLogger
 	var sinks []io.Writer
 
 	if stdout {
