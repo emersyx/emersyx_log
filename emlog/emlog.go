@@ -47,19 +47,25 @@ func (el EmersyxLogger) Println(level uint, v ...interface{}) {
 	}
 }
 
-// Fatal calls the Print method with the ELFatal level and the given arguments.
+// Fatal calls the Print method with the ELFatal level and the given arguments. After the logging message gets
+// printed, the os.Exit(1) function is called.
 func (el EmersyxLogger) Fatal(v ...interface{}) {
 	el.Print(ELFatal, v...)
+	os.Exit(1)
 }
 
-// Fatalf calls the Printf method with the ELFatal level and the given arguments.
+// Fatalf calls the Printf method with the ELFatal level and the given arguments. After the logging message gets
+// printed, the os.Exit(1) function is called.
 func (el EmersyxLogger) Fatalf(format string, v ...interface{}) {
 	el.Printf(ELFatal, format, v...)
+	os.Exit(1)
 }
 
-// Fatalln calls the Println method with the ELFatal level and the given arguments.
+// Fatalln calls the Println method with the ELFatal level and the given arguments. After the logging message gets
+// printed, the os.Exit(1) function is called.
 func (el EmersyxLogger) Fatalln(v ...interface{}) {
 	el.Println(ELFatal, v...)
+	os.Exit(1)
 }
 
 // Error calls the Print method with the ELError level and the given arguments.
