@@ -1,6 +1,7 @@
 package emlog
 
 import (
+	"errors"
 	"io"
 	"log"
 	"os"
