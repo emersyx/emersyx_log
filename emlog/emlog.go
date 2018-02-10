@@ -135,15 +135,20 @@ func (el EmersyxLogger) Debugln(v ...interface{}) {
 // NewEmersyxLogger returns an EmersyxLogger instance with the default format, which writes messages to specified
 // io.Writer instance. The component argument is prepended to logs for easier filtering, while the level argument
 // controls the verbosity.
-func NewEmersyxLogger(writer io.Writer, component string, level uint) (EmersyxLogger, error) {
-	var emlog EmersyxLogger
+func NewEmersyxLogger(writer io.Writer, component string, level uint) (*EmersyxLogger) {
+	emlog := new(EmersyxLogger)
 
 	emlog.logger = log.New(
 		writer,
 		"["+component+"] ",
 		log.Ldate|log.Ltime,
 	)
+
+	if emlog.logger == nil {
+		return nil
+	}
+
 	emlog.level = level
 
-	return emlog, nil
+	return emlog
 }
