@@ -2,9 +2,11 @@ package emlog
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -28,10 +30,10 @@ type EmersyxLogger struct {
 	level  uint
 }
 
-// printCaller uses the runtime.Caller function to recover information from the call stack and print the location where
-// the logging call was executed. If the information can be recovered, then it is printed. Otherwise, the function does
-// nothing.
-func (el EmersyxLogger) printCaller() {
+// findCaller uses the runtime.Caller function to recover information from the call stack and print the location where
+// the logging call was executed. If the information can be recovered, then it is returned. Otherwise, the function
+// returns an empty string.
+func (el EmersyxLogger) findCaller() string {
 	// argument values for runtime.Caller:
 	// 0 will simply show this line
 	// 1 will show the location of the call in either EmersyxLogger.print, EmersyxLogger.printf, EmersyxLogger.println
@@ -39,31 +41,42 @@ func (el EmersyxLogger) printCaller() {
 	// 3 will show the location of the call to one of the public EmersyxLogger methods, which is what we want
 	_, file, line, ok := runtime.Caller(3)
 	if ok {
-		el.logger.Printf("%s:%d ", file, line)
+		return fmt.Sprintf("[%s:%d]", filepath.Base(file), line)
 	}
+	return ""
+}
+
+// prependCaller is a utility function which simply prepends the caller information to a list of other arguments.
+func (el EmersyxLogger) prependCaller(caller string, v ...interface{}) []interface{} {
+	allv := make([]interface{}, 0, 1+len(v))
+	allv = append(allv, caller)
+	allv = append(allv, v...)
+	return allv
 }
 
 // print calls send messages to the standard logger. Arguments are handled in the manner of fmt.Print.
 func (el EmersyxLogger) print(level uint, v ...interface{}) {
 	if level <= el.level {
-		el.printCaller()
-		el.logger.Print(v...)
+		el.logger.Print(el.prependCaller(el.findCaller(), v)...)
 	}
 }
 
 // printf calls send messages to the standard logger. Arguments are handled in the manner of fmt.Printf.
 func (el EmersyxLogger) printf(level uint, format string, v ...interface{}) {
 	if level <= el.level {
-		el.printCaller()
-		el.logger.Printf(format, v...)
+		caller := el.findCaller()
+		if caller != "" {
+			el.logger.Printf("%s "+format, el.prependCaller(caller, v)...)
+		} else {
+			el.logger.Printf(format, v...)
+		}
 	}
 }
 
 // println calls send messages to the standard logger. Arguments are handled in the manner of fmt.Println.
 func (el EmersyxLogger) println(level uint, v ...interface{}) {
 	if level <= el.level {
-		el.printCaller()
-		el.logger.Println(v...)
+		el.logger.Println(el.prependCaller(el.findCaller(), v)...)
 	}
 }
 
