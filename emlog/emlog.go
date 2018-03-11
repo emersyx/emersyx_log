@@ -47,7 +47,7 @@ func (el EmersyxLogger) findCaller() string {
 }
 
 // prependCaller is a utility function which simply prepends the caller information to a list of other arguments.
-func (el EmersyxLogger) prependCaller(caller string, v ...interface{}) []interface{} {
+func (el EmersyxLogger) prependCaller(caller string, v []interface{}) []interface{} {
 	allv := make([]interface{}, 0, 1+len(v))
 	allv = append(allv, caller)
 	allv = append(allv, v...)
