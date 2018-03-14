@@ -26,8 +26,9 @@ const (
 // EmersyxLogger is an implementation of a logger based on the standard log.Logger type. The EmersyxLogger
 // implementation offers additional logging functionality
 type EmersyxLogger struct {
-	logger *log.Logger
-	level  uint
+	componentID string
+	logger      *log.Logger
+	level       uint
 }
 
 // findCaller uses the runtime.Caller function to recover information from the call stack and print the location where
@@ -36,47 +37,54 @@ type EmersyxLogger struct {
 func (el EmersyxLogger) findCaller() string {
 	// argument values for runtime.Caller:
 	// 0 will simply show this line
-	// 1 will show the location of the call in either EmersyxLogger.print, EmersyxLogger.printf, EmersyxLogger.println
-	// 2 will show the location of the call in one of the public EmersyxLogger methods
-	// 3 will show the location of the call to one of the public EmersyxLogger methods, which is what we want
-	_, file, line, ok := runtime.Caller(3)
+	// 1 will show the location of the call in addComponentID
+	// 2 will show the location of the call in either EmersyxLogger.print, EmersyxLogger.printf, EmersyxLogger.println
+	// 3 will show the location of the call in one of the public EmersyxLogger methods
+	// 4 will show the location of the call to one of the public EmersyxLogger methods, which is what we want
+	_, file, line, ok := runtime.Caller(4)
 	if ok {
-		return fmt.Sprintf("[%s:%d]", filepath.Base(file), line)
+		return fmt.Sprintf("%s:%d", filepath.Base(file), line)
 	}
 	return ""
 }
 
-// prependCaller is a utility function which simply prepends the caller information to a list of other arguments.
-func (el EmersyxLogger) prependCaller(caller string, v []interface{}) []interface{} {
+// addComponentID is a utility function which simply adds the component identifier and caller information to the list of
+// other arguments sent for printing logs.
+func (el EmersyxLogger) addComponentID(v []interface{}) []interface{} {
+	var prefix string
 	allv := make([]interface{}, 0, 1+len(v))
-	allv = append(allv, caller)
+
+	caller := el.findCaller()
+	if len(caller) > 0 {
+		prefix = fmt.Sprintf("[%s/%s]", el.componentID, caller)
+	} else {
+		prefix = fmt.Sprintf("[%s]", el.componentID)
+	}
+
+	allv = append(allv, prefix)
 	allv = append(allv, v...)
+
 	return allv
 }
 
 // print calls send messages to the standard logger. Arguments are handled in the manner of fmt.Print.
 func (el EmersyxLogger) print(level uint, v ...interface{}) {
 	if level <= el.level {
-		el.logger.Print(el.prependCaller(el.findCaller(), v)...)
+		el.logger.Print(el.addComponentID(v)...)
 	}
 }
 
 // printf calls send messages to the standard logger. Arguments are handled in the manner of fmt.Printf.
 func (el EmersyxLogger) printf(level uint, format string, v ...interface{}) {
 	if level <= el.level {
-		caller := el.findCaller()
-		if caller != "" {
-			el.logger.Printf("%s "+format, el.prependCaller(caller, v)...)
-		} else {
-			el.logger.Printf(format, v...)
-		}
+		el.logger.Printf("%s "+format, el.addComponentID(v)...)
 	}
 }
 
 // println calls send messages to the standard logger. Arguments are handled in the manner of fmt.Println.
 func (el EmersyxLogger) println(level uint, v ...interface{}) {
 	if level <= el.level {
-		el.logger.Println(el.prependCaller(el.findCaller(), v)...)
+		el.logger.Println(el.addComponentID(v)...)
 	}
 }
 
@@ -147,18 +155,14 @@ func (el EmersyxLogger) Debugln(v ...interface{}) {
 }
 
 // NewEmersyxLogger returns an EmersyxLogger instance with the default format, which writes messages to specified
-// io.Writer instance. The component argument is prepended to logs for easier filtering, while the level argument
-// controls the verbosity.
-func NewEmersyxLogger(writer io.Writer, component string, level uint) (*EmersyxLogger, error) {
-	if writer == nil {
-		return nil, errors.New("the io.Writer argument cannot be nil")
-	}
-
+// io.Writer instance. The componentID argument is used to help differentiate between logs of different emersyx
+// components. The level argument controls the verbosity.
+func NewEmersyxLogger(writer io.Writer, componentID string, level uint) (*EmersyxLogger, error) {
 	emlog := new(EmersyxLogger)
 
 	emlog.logger = log.New(
 		writer,
-		"["+component+"] ",
+		"",
 		log.Ldate|log.Ltime,
 	)
 
@@ -166,7 +170,31 @@ func NewEmersyxLogger(writer io.Writer, component string, level uint) (*EmersyxL
 		return nil, errors.New("could not create a logger instance")
 	}
 
+	emlog.componentID = componentID
 	emlog.level = level
 
 	return emlog, nil
+}
+
+// SetOutput sets the io.Writer instance where logging messages are written to.
+func (el *EmersyxLogger) SetOutput(writer io.Writer) error {
+	if writer == nil {
+		return errors.New("the io.Writer argument cannot be nil")
+	}
+	el.logger.SetOutput(writer)
+	return nil
+}
+
+// SetComponentID sets the identifier of the component which makes use of the EmersyxLogger instance.
+func (el *EmersyxLogger) SetComponentID(componentID string) error {
+	if len(componentID) == 0 {
+		return errors.New("the componentID argument cannot have length equal to 0")
+	}
+	el.componentID = componentID
+	return nil
+}
+
+// SetLevel sets the logging verbosity level for the EmersyxLogger instance.
+func (el *EmersyxLogger) SetLevel(level uint) {
+	el.level = level
 }
